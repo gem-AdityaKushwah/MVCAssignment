@@ -1,0 +1,137 @@
+﻿@model IEnumerable<MVCAssignment1.Models.UserDetail>
+@{
+    ViewBag.Title = "UserList";
+}
+
+<h2>User List</h2>
+
+<div class="form-group d-flex justify-content-between align-items-center">
+    <input type="text" id="searchTerm" placeholder="Search..." class="form-control" onkeyup="filterTable()" />
+    <a href="@Url.Action("Login", "Home")" class="btn btn-danger btn-sm">Logout</a>
+</div>
+
+<table border="1" cellpadding="5" cellspacing="0" class="table table-striped" id="userTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DOB)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gender)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => user.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.DOBFormatted)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.Gender)
+                </td>
+                <td>
+                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="showUserDetails(@user.UserID)">Details</a>
+                <a href="@Url.Action("Edit", "Home", new { id = user.UserID })" class="btn btn-secondary btn-sm">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p>No users found.</p>
+}
+
+
+<div class="modal fade" id="userDetailsModal" tabindex="-1" role="dialog" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>*@
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            @*<div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.min.js"></script>
+
+<script>
+    function filterTable() {
+        var input = document.getElementById("searchTerm");
+        var filter = input.value.toLowerCase();
+        var table = document.getElementById("userTable");
+        var rows = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+            var cells = rows[i].getElementsByTagName("td");
+            var match = false;
+
+            for (var j = 0; j < cells.length; j++) {
+                if (cells[j]) {
+                    var text = cells[j].innerText || cells[j].textContent;
+                    if (text.toLowerCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+            }
+
+            rows[i].style.display = match ? "" : "none"; // Show or hide the row
+        }
+    }
+
+    // Event listener for search input
+    $(document).ready(function () {
+        $('#searchTerm').on('input', function () {
+            filterTable(); // Call filter function on input change
+        });
+    });
+
+
+    function showUserDetails(userId) {
+    var url = '@Url.Action("ShowUserDetails", "Home")';
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: { id: userId },
+        success: function (data) {
+            console.log(data);
+            $('#userDetailsModal .modal-body').html(data);
+            $('#userDetailsModal').modal('show');
+        },
+        error: function (xhr, status, error) {
+            console.log("Error details: ", xhr.responseText); // Log the error response
+            alert('Error retrieving user details.'); // Alert the user
+        }
+    });
+}
+
+</script>

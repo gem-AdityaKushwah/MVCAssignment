@@ -1,0 +1,38 @@
+﻿@model MVCAssignment1.Models.Login
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<h2>Login</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <div class="alert alert-danger">
+        @ViewBag.Message
+    </div>
+}
+
+@using (Html.BeginForm("Login", "Home", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="returnUrl" value="@Request.QueryString["returnUrl"]" />
+
+    <div>
+        @Html.LabelFor(m => m.Email)
+        @Html.TextBoxFor(m => m.Email)
+        @Html.ValidationMessageFor(m => m.Email)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Password)
+        @Html.PasswordFor(m => m.Password)
+        @Html.ValidationMessageFor(m => m.Password)
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+}
+
+<div>
+    <a href="@Url.Action("Registration", "Home")" style="cursor:pointer">Register Yourself</a> |
+    <a href="@Url.Action("ForgotPassword", "Home")" style="cursor:pointer">Forgot Password?</a>
+</div>
